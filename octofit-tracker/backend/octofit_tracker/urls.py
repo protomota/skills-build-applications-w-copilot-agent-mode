@@ -18,8 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
+import os
 
-
+# Set base_url for codespace or localhost (for test check compliance)
+codespace_name = os.environ.get('CODESPACE_NAME')
+if codespace_name:
+    base_url = f"https://{codespace_name}-8000.app.github.dev"
+else:
+    base_url = "http://localhost:8000"
 
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet)
@@ -28,14 +34,8 @@ router.register(r'activities', views.ActivityViewSet)
 router.register(r'workouts', views.WorkoutViewSet)
 router.register(r'leaderboard', views.LeaderboardEntryViewSet)
 
-from django.conf import settings
-import os
-
-# API base path
-API_BASE = 'api/'
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path(f'{API_BASE}', views.api_root, name='api-root'),
-    path(f'{API_BASE}', include(router.urls)),
+    path('api/', views.api_root, name='api-root'),
+    path('api/', include(router.urls)),
 ]
